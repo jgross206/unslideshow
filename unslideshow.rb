@@ -7,13 +7,18 @@ root = Nokogiri::HTML(open(ARGV[0]))
 urls = []
 
 root.xpath('//div[@class = "article-slide-belt-slide"]/a').each do |node|
-  urls << node['href']
+  urls << node
 end
 
-#urls.first do |url|
-  page = Nokogiri::HTML(open(COMPLEX_BASE + urls[1]))
+master = root.xpath('//div[@id = "slide_main_content"]').first
+urls.shift
+
+urls.each do |url|
+  page = Nokogiri::HTML(open(COMPLEX_BASE + url['href']))
   page.xpath('//div[@id = "slide_main_content"]').each do |node|
-    puts "something"
-    puts node.children
+    master.add_next_sibling(node)
   end
-#end
+end
+
+puts root.to_html
+
