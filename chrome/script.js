@@ -1,3 +1,58 @@
+//Grab all the <a> tags of the slideshow elements
+var urls = document.getElementsByClassName("article-slide-belt-slide");
+
+//Save a reference to the first slide so we can insert subsequent slides after it
+var main = document.getElementById("slide_main_content");
+var hrefs = [];
+
+//Extract the actual URL strings from the <a> tags
+for (var i = 0; i < urls.length; i++) {
+  hrefs.push(urls[i].firstChild.href);
+}
+
+var URLIndex = 0;
+fireXHR(0);
+
+function loadSlideContent() {
+  var parser = new DOMParser();
+  
+  //take the raw HTML strings for the slide from the xhr response object and parse it to a DOM object
+  var doc = parser.parseFromString(xhr.responseText, 'text/html');
+  
+  //grab the actual slide content from the DOM object
+  var content = doc.getElementById('slide_main_content');
+  
+  //inject that content into the main page
+  document.getElementById("slide_main_content").appendChild(content);
+  
+  //increment the index and go again
+  fireXHR(++URLIndex);
+}
+
+function fireXHR(i) {
+  xhr = new XMLHttpRequest();
+  xhr.open("GET", hrefs[i], true);
+  xhr.onload = loadSlideContent;
+  xhr.send(null);
+}
+
+/*
+ * The code below this line was written by Eli Grey and posted at http://stackoverflow.com/questions/9500318/troubles-trying-to-parse-an-html-string-with-domparser
+ * It extends the DOMParser() object to be able to parse HTML.
+ * The original license is left intact.
+ */
+
+/* 
+ * DOMParser HTML extension 
+ * 2012-02-02 
+ * 
+ * By Eli Grey, http://eligrey.com 
+ * Public domain. 
+ * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK. 
+ */  
+
+/*! @source https://gist.github.com/1129031 */  
+/*global document, DOMParser*/  
 (function(DOMParser) {  
     "use strict";  
     var DOMParser_proto = DOMParser.prototype  
@@ -32,33 +87,3 @@
         }  
     };  
 }(DOMParser));
-
-var COMPLEX_BASE = "http://www.complex.com";
-
-var urls = document.getElementsByClassName("article-slide-belt-slide");
-var main = document.getElementById("slide_main_content");
-var hrefs = [];
-
-for (var i = 0; i < urls.length; i++) {
-  hrefs.push(urls[i].firstChild.href);
-  }
-
-var global = 0;
-fireXHR(0);
-function loadSlideContent() {
-  var parser = new DOMParser();
-  var doc = parser.parseFromString(xhr.responseText, 'text/html');
-  console.log(xhr, xhr.responseText);
-  var content = doc.getElementById('slide_main_content');
-  console.log(content);
-  document.getElementById("slide_main_content").appendChild(content);
-  fireXHR(++global);
-}
-
-function fireXHR(i) {
-  xhr = new XMLHttpRequest();
-  console.log(hrefs[i]);
-  xhr.open("GET", hrefs[i], true);
-  xhr.onload = loadSlideContent;
-  xhr.send(null);
-}
